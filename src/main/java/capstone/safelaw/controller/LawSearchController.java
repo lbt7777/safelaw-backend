@@ -24,10 +24,12 @@ public class LawSearchController {
         List<SearchResponseDto> responseList = new ArrayList<>();
         SearchResponseDto mockData = new SearchResponseDto();
 
-        mockData.setCaseId("2023다12345");
-        mockData.setTitle("전세보증금반환청구의 소");
-        mockData.setSummary("요청하신 키워드 " + request.getKeywords() + " 에 대한 임시 검색 결과입니다.");
-
+        mockData.setPrecedId("338315");
+        mockData.setCaseName("업무방해등");
+        mockData.setCaseNum("2022고단420");
+        mockData.setSentenceDate("2022.12.09.");
+        mockData.setCourtName("춘천지방법원 영월지원");
+        mockData.setSummary("2022년 10월 식당에서 소란을 피우며 재물을 손괴하고, 경찰관의 직무집행을 방해한 사건에 대해...");
         responseList.add(mockData);
         return responseList;
     }
