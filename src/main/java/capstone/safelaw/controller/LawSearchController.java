@@ -1,36 +1,70 @@
 package capstone.safelaw.controller;
 
-import capstone.safelaw.dto.SearchRequestDto;
-import capstone.safelaw.dto.SearchResponseDto;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import capstone.safelaw.domain.LegalData;
+import capstone.safelaw.domain.Precedent;
+import capstone.safelaw.domain.Precedent_;
+import capstone.safelaw.repository.LegalDataRepository;
+import capstone.safelaw.service.EmbeddingService;
+import io.objectbox.Box;
+import io.objectbox.BoxStore;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/laws") // 이 API의 기본 주소입니다.
-@Tag(name = "Law Search", description = "판례 검색 API") // Swagger 탭 이름
+@RequestMapping("/api")
+@CrossOrigin(origins = "*")
 public class LawSearchController {
 
+    private final EmbeddingService embeddingService;
+    private final LegalDataRepository legalDataRepository;
+    private final Box<Precedent> precedentBox;
+
+    public LawSearchController(EmbeddingService embeddingService, LegalDataRepository legalDataRepository, BoxStore boxStore) {
+        this.embeddingService = embeddingService;
+        this.legalDataRepository = legalDataRepository;
+        this.precedentBox = boxStore.boxFor(Precedent.class);
+    }
+
     @PostMapping("/search")
-    @Operation(summary = "키워드 기반 판례 검색", description = "온디바이스 AI에서 추출한 키워드를 받아 관련 판례를 반환합니다.")
-    public List<SearchResponseDto> searchLaws(@RequestBody SearchRequestDto request) {
+    public List<LegalData> searchLaw(@RequestBody Map<String, String> request) {
+        try {
+            System.out.println("\n=========================================");
 
-        // TODO: 향후 service 패키지에서 Vector DB 검색 로직을 연결할 예정입니다.
-        // 지금은 프론트엔드 테스트를 위해 가짜(Mock) 데이터를 반환합니다.
+            // 🚨 1. DB에 들어있는 실제 판례의 벡터 규격 확인!
+            Precedent sample = precedentBox.query().build().findFirst();
+            if (sample != null && sample.embedding != null) {
+                // 📍 vector를 embedding으로 수정 완료
+                System.out.println("🔍 1. DB 안의 자물쇠(벡터) 규격: " + sample.embedding.length + "개");
+            } else {
+                System.out.println("❌ DB의 판례 벡터 데이터가 비어있습니다 (null)!");
+            }
 
-        List<SearchResponseDto> responseList = new ArrayList<>();
-        SearchResponseDto mockData = new SearchResponseDto();
+            String keyword = request.get("keyword");
+            float[] queryVector = embeddingService.getEmbedding(keyword);
+            System.out.println("🔍 2. AI가 뽑아낸 열쇠(벡터) 규격: " + queryVector.length + "개");
 
-        mockData.setPrecedId("338315");
-        mockData.setCaseName("업무방해등");
-        mockData.setCaseNum("2022고단420");
-        mockData.setSentenceDate("2022.12.09.");
-        mockData.setCourtName("춘천지방법원 영월지원");
-        mockData.setSummary("2022년 10월 식당에서 소란을 피우며 재물을 손괴하고, 경찰관의 직무집행을 방해한 사건에 대해...");
-        responseList.add(mockData);
-        return responseList;
+            // 🚨 2. AI 열쇠로 DB 검색 시도
+            List<Precedent> topResults = precedentBox.query()
+                    // 📍 Precedent_.vector를 Precedent_.embedding으로 수정 완료
+                    .nearestNeighbors(Precedent_.embedding, queryVector, 3)
+                    .build()
+                    .find();
+
+            System.out.println("💡 3. 매칭 성공한 판례 개수: " + topResults.size() + "개");
+            System.out.println("=========================================\n");
+
+            List<LegalData> finalResults = new ArrayList<>();
+            for (Precedent p : topResults) {
+                legalDataRepository.findById(p.id).ifPresent(finalResults::add);
+            }
+            return finalResults;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

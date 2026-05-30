@@ -19,8 +19,17 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-	compileOnly 'org.projectlombok:lombok'
+    implementation("io.objectbox:objectbox-java:5.4.1")
+    implementation("io.objectbox:objectbox-linux:5.4.1")
+    implementation 'io.objectbox:objectbox-windows:5.4.1'
+    implementation 'com.microsoft.onnxruntime:onnxruntime:1.17.1'
+    implementation 'ai.djl.huggingface:tokenizers:0.27.0'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.xerial:sqlite-jdbc:3.45.1.0'
+    implementation 'org.hibernate.orm:hibernate-community-dialects:6.4.4.Final'
+    compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor("io.objectbox:objectbox-processor:5.4.1")
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testCompileOnly 'org.projectlombok:lombok'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

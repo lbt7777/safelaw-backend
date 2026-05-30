@@ -1,0 +1,7 @@
+### 판례 검색 테스트
+POST http://localhost:8080/api/search
+Content-Type: application/json
+
+{
+  "keyword": "전세 보증금을 돌려받지 못하고 사기를 당했습니다."
+}

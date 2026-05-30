@@ -35,3 +35,21 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# --- Custom Ignore ---
+# 로그 파일
+*.log
+
+# 로컬 DB 및 ObjectBox 라이브러리
+*.db
+*.db-shm
+*.db-wal
+*.dll
+*.mdb
+*.onnx
+
+# 1.3GB 메인 DB 창고 (절대 업로드 금지)
+safelaw-db/
+
+# (만약 JSON 원본도 안 올릴 거라면 아래도 추가)
+criminal_*.json
