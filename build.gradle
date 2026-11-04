@@ -19,22 +19,22 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-    implementation("io.objectbox:objectbox-java:5.4.1")
-    implementation("io.objectbox:objectbox-linux:5.4.1")
-    implementation 'io.objectbox:objectbox-windows:5.4.1'
-    implementation 'com.microsoft.onnxruntime:onnxruntime:1.17.1'
-    implementation 'ai.djl.huggingface:tokenizers:0.27.0'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.xerial:sqlite-jdbc:3.45.1.0'
-    implementation 'org.hibernate.orm:hibernate-community-dialects:6.4.4.Final'
+    implementation 'org.hibernate.orm:hibernate-community-dialects'
+    // 회원 비밀번호 BCrypt 해시 (Spring Security 전체가 아닌 crypto 모듈만 사용)
+    implementation 'org.springframework.security:spring-security-crypto'
+    // 로그인 토큰(JWT)
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-gson:0.12.6'
     compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
-    annotationProcessor("io.objectbox:objectbox-processor:5.4.1")
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testCompileOnly 'org.projectlombok:lombok'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testAnnotationProcessor 'org.projectlombok:lombok'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3'
 }
 
 tasks.named('test') {
